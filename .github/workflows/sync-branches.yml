@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   detect-and-sync:
     runs-on: ubuntu-latest
@@ -11,61 +14,53 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Get changed files
-        id: changes
+      - name: Detect changes and sync branches
         run: |
           CHANGED=$(git diff --name-only HEAD~1 HEAD 2>/dev/null || echo "")
-          echo "files=$CHANGED" >> $GITHUB_OUTPUT
-          echo "Changed files: $CHANGED"
+          echo "Changed files:"
+          echo "$CHANGED"
 
-      - name: Sync strategy branch
-        if: contains(steps.changes.outputs.files, '外投策略生成skill/')
-        run: |
-          git checkout skill/strategy 2>/dev/null || git checkout -b skill/strategy
-          git checkout main -- "外投策略生成skill/"
-          git add -A
-          git diff --cached --quiet || (git commit -m "sync: update strategy from main" && git push origin skill/strategy)
-          git checkout main
+          sync_branch() {
+            local branch="$1"
+            local folder="$2"
+            echo "--- Syncing $branch ---"
+            git checkout "$branch" 2>/dev/null || git checkout -b "$branch"
+            git checkout main -- "$folder"
+            git add -A
+            if ! git diff --cached --quiet; then
+              git commit -m "sync: update $branch from main"
+              git push origin "$branch"
+              echo "Pushed $branch"
+            else
+              echo "No changes for $branch"
+            fi
+            git checkout main
+          }
 
-      - name: Sync kol-screen branch
-        if: contains(steps.changes.outputs.files, '外投达人筛选skill/')
-        run: |
-          git checkout skill/kol-screen 2>/dev/null || git checkout -b skill/kol-screen
-          git checkout main -- "外投达人筛选skill/"
-          git add -A
-          git diff --cached --quiet || (git commit -m "sync: update kol-screen from main" && git push origin skill/kol-screen)
-          git checkout main
+          if echo "$CHANGED" | grep -q "外投策略生成skill/"; then
+            sync_branch "skill/strategy" "外投策略生成skill/"
+          fi
 
-      - name: Sync xhs branch
-        if: contains(steps.changes.outputs.files, '外投小红书内容生成')
-        run: |
-          git checkout skill/xhs 2>/dev/null || git checkout -b skill/xhs
-          git checkout main -- "外投小红书内容生成&审核skill/"
-          git add -A
-          git diff --cached --quiet || (git commit -m "sync: update xhs from main" && git push origin skill/xhs)
-          git checkout main
+          if echo "$CHANGED" | grep -q "外投达人筛选skill/"; then
+            sync_branch "skill/kol-screen" "外投达人筛选skill/"
+          fi
 
-      - name: Sync quote branch
-        if: contains(steps.changes.outputs.files, '外投比价skill/')
-        run: |
-          git checkout skill/quote 2>/dev/null || git checkout -b skill/quote
-          git checkout main -- "外投比价skill/"
-          git add -A
-          git diff --cached --quiet || (git commit -m "sync: update quote from main" && git push origin skill/quote)
-          git checkout main
+          if echo "$CHANGED" | grep -q "外投小红书内容生成"; then
+            sync_branch "skill/xhs" "外投小红书内容生成&审核skill/"
+          fi
 
-      - name: Sync pipeline branch
-        if: contains(steps.changes.outputs.files, 'pipeline/')
-        run: |
-          git checkout skill/pipeline 2>/dev/null || git checkout -b skill/pipeline
-          git checkout main -- "pipeline/"
-          git add -A
-          git diff --cached --quiet || (git commit -m "sync: update pipeline from main" && git push origin skill/pipeline)
-          git checkout main
+          if echo "$CHANGED" | grep -q "外投比价skill/"; then
+            sync_branch "skill/quote" "外投比价skill/"
+          fi
+
+          if echo "$CHANGED" | grep -q "pipeline/"; then
+            sync_branch "skill/pipeline" "pipeline/"
+          fi
+
+          echo "=== Sync complete ==="
