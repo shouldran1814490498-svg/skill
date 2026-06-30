@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# 本地权限配置（含本机路径）
+.claude/settings.local.json
+
+# 已生成的投放策略报告示例
+references/
