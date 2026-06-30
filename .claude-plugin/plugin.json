@@ -1,5 +1,5 @@
 {
-  "name": "pharma-marketing-skills",
-  "description": "药品社媒外投全流程技能合集：策略生成→达人筛选→内容生成&审核→比价核验，支持单独使用或流水线串联",
+  "name": "xhs-content-generator",
+  "description": "小红书达人笔记生成与合规审核：根据策略报告和达人明细表，自动生成个性化笔记内容并执行7维合规审核",
   "author": { "name": "shouldran1814490498-svg" }
 }
