@@ -17,7 +17,7 @@
 
 第三方市场默认**关闭**自动更新，需手动开启一次，之后作者每次发布新版你就自动收到：
 
-1. 输入 `/plugin` 打开菜单
+1. 输入`/plugin` 打开菜单
 2. 进入 **Marketplaces** 标签
 3. 选中 `alvinxie-skills`
 4. 选择 **Enable auto-update**
