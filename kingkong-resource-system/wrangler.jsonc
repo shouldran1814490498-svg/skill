@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "jd-health-kingkong-resource",
+  "account_id": "5b4b9c503930ecb894a86856f3faff84",
+  "main": "vinext/server/fetch-handler",
+  "compatibility_date": "2026-08-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jd-health-kingkong-resource-db",
+      "database_id": "b35dbd37-3ae4-4612-867c-391b3fa69651",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}
